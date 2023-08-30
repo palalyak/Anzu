@@ -3,7 +3,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class LogManager {
+public class LogManager extends Logs {
 
     public static List<VehicleLog> sortLogBy(String key, List<VehicleLog> logs) {
         Comparator<VehicleLog> comparator = getComparatorByKey(key);
@@ -133,6 +133,14 @@ public class LogManager {
 
     public static SimpleDateFormat getFormattedDate(String pattern) {
         return new SimpleDateFormat(pattern);
+    }
+
+    public static List<VehicleLog> getValidLogs() {
+        try {
+            return getLogs();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

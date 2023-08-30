@@ -1,57 +1,7 @@
-import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class ParkingLotManager {
-    private List<VehicleLog> vehicleLogList;
-
-    public ParkingLotManager() {
-        vehicleLogList = new ArrayList<>();
-    }
-
-    public void processLogs(List<String[]> logs) {
-        logs.sort(Comparator.comparing(log -> log[0]));
-        for (String[] logData : logs) {
-            if (isValidLog(logData)) {
-                try {
-                    Date timestamp = LogManager.getFormattedDate("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").parse(logData[2]);
-                    VehicleLog vehicleLog = new VehicleLog(logData[0], logData[1], timestamp, logData[3]);
-                    vehicleLogList.add(vehicleLog);
-                } catch (ParseException e) {
-                    throw new IllegalArgumentException("Error parsing timestamp: " + logData[2], e);
-                }
-            }
-        }
-    }
-
-    private boolean isValidLog(String[] logData) {
-        if (logData.length < 4) {
-            return false;
-        }
-
-        String timestampStr = logData[2];
-        if (timestampStr.length() != 24 || !timestampStr.endsWith("Z")) {
-            return false;
-        }
-
-        String regex = "^(0{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z|" +
-                "\\d{4}-0{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z|" +
-                "\\d{4}-\\d{2}-0{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z|" +
-                "0{4}-0{2}-0{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z)$";
-
-        if (timestampStr.matches(regex)) {
-            return false;
-        }
-
-        Date timestamp;
-        try {
-            timestamp = LogManager.getFormattedDate("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").parse(timestampStr);
-        } catch (ParseException e) {
-            return false;
-        }
-        return true;
-    }
-
     public int isNightParking(List<VehicleLog> validLogs) {
         int count = 0;
         Map<Integer, List<VehicleLog>> vehicleLogsMap = LogManager.groupLogsBy("vehicleId", validLogs);
@@ -214,10 +164,6 @@ public class ParkingLotManager {
         int minute = calendar.get(Calendar.MINUTE);
         int second = calendar.get(Calendar.SECOND);
         return hour > 5 || (hour == 5 && minute == 59 && second == 59);
-    }
-
-    public List<VehicleLog> getVehicleLogList() {
-        return vehicleLogList;
     }
 
 }
